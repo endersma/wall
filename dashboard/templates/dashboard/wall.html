@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="% static 'main.js' %}"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'dashboard/wall.css' %}"> 
+    <title>Dojo Wall</title>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <span class="navbar-brand mb-0 h1">CodingDojo wall</span>
+        <span class="navbar-brand mb-0 ml-auto h1">Welcome {{ user.first_name }}</span>
+        <span class="navbar-brand mb-0 h1"><a href="/logout">Log Out</a></span>
+    </nav>
+    <div class="container-fluid m-5">
+        <h2>Post a message</h2>
+        <div class="row m-4">
+            <form action="/wall/create" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <textarea name="message" id="message" cols="175" rows="7"></textarea>
+                </div>
+                <div class="text-left">
+                    <button type="submit" class="btn btn-primary">Post</button>
+                </div>
+            </form>
+        </div>
+        <div id="post" class="row w-75 m-4">
+            {% for post in messages %}
+            <div class="border border-secondary m-2 p-1 w-75">
+                <blockquote>{{ post.poster.first_name }} {{ post.poster.last_name }} - {{ post.created_at }}</blockquote>
+                <blockquote>{{ post.message }}</blockquote>
+                {% for comment in post.message_comments.all %}
+                    <p>{{ comment.poster.first_name }} {{ comment.poster.last_name }} - {{ comment.created_at }}</p>
+                    <p>{{ comment.comment }}</p>
+                    {% if comment.poster.id == user.id %}
+                        <a href="/wall/comment/delete/{{ comment.id }}" role="button" class="btn btn-primary">Delete</a>
+                    {% endif %}
+                {% endfor %}
+                <form action="/wall/comment/create/{{post.id}}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <textarea name="comment" id="comment" cols="100" rows="3"></textarea>
+                    </div>
+                    <div class="text-left">
+                        <button type="submit" class="btn btn-primary">comment</button>
+                    </div>
+                </form>
+            </div>
+            {% endfor %}           
+        </div>
+    </div>
+</body >
+</html>
